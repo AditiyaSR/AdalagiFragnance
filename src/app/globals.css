@@ -1,0 +1,409 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600;1,700&family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap');
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/* Luxury E-commerce Theme Variables */
+:root {
+  --font-serif: "Playfair Display", Georgia, serif;
+  --font-sans: "Inter", system-ui, sans-serif;
+  
+  /* Luxury Color Palette */
+  --gold-50: #fdf9f3;
+  --gold-100: #f9f0e1;
+  --gold-200: #f2dfc2;
+  --gold-300: #e8c896;
+  --gold-400: #d4a85a;
+  --gold-500: #c49a3a;
+  --gold-600: #a67c2e;
+  --gold-700: #8b652a;
+  --gold-800: #735229;
+  --gold-900: #5f4425;
+  
+  /* Premium Neutrals */
+  --obsidian: #0a0a0a;
+  --charcoal: #1a1a1a;
+  --graphite: #2d2d2d;
+  --slate: #4a4a4a;
+  --silver: #8a8a8a;
+  --pearl: #f5f5f5;
+  --ivory: #fafafa;
+  
+  --background: #ffffff;
+  --foreground: #0a0a0a;
+  --card: #ffffff;
+  --card-foreground: #0a0a0a;
+  --popover: #ffffff;
+  --popover-foreground: #0a0a0a;
+  --primary: #c49a3a;
+  --primary-foreground: #ffffff;
+  --secondary: #1a1a1a;
+  --secondary-foreground: #ffffff;
+  --muted: #f5f5f5;
+  --muted-foreground: #4a4a4a;
+  --accent: #c49a3a;
+  --accent-foreground: #ffffff;
+  --destructive: #dc2626;
+  --destructive-foreground: #ffffff;
+  --border: #e5e5e5;
+  --input: #e5e5e5;
+  --ring: #c49a3a;
+  
+  --radius: 0.5rem;
+}
+
+.dark {
+  --background: #0a0a0a;
+  --foreground: #fafafa;
+  --card: #1a1a1a;
+  --card-foreground: #fafafa;
+  --popover: #1a1a1a;
+  --popover-foreground: #fafafa;
+  --primary: #d4a85a;
+  --primary-foreground: #0a0a0a;
+  --secondary: #2d2d2d;
+  --secondary-foreground: #fafafa;
+  --muted: #2d2d2d;
+  --muted-foreground: #8a8a8a;
+  --accent: #d4a85a;
+  --accent-foreground: #0a0a0a;
+  --destructive: #ef4444;
+  --destructive-foreground: #fafafa;
+  --border: #2d2d2d;
+  --input: #2d2d2d;
+  --ring: #d4a85a;
+}
+
+/* Base Styles */
+* {
+  border-color: var(--border);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Luxury Typography */
+.font-serif {
+  font-family: var(--font-serif);
+}
+
+.font-sans {
+  font-family: var(--font-sans);
+}
+
+/* Custom Scrollbar - Elegant Style */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--slate);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--gold-400);
+}
+
+/* Luxury Animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes shimmer {
+  0% { background-position: -1000px 0; }
+  100% { background-position: 1000px 0; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes pulse-gold {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(196, 154, 58, 0.4); }
+  50% { box-shadow: 0 0 0 10px rgba(196, 154, 58, 0); }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.8s ease-out forwards;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.6s ease-out forwards;
+}
+
+.animate-shimmer {
+  animation: shimmer 2s infinite linear;
+  background: linear-gradient(90deg, transparent, rgba(196, 154, 58, 0.1), transparent);
+  background-size: 1000px 100%;
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+.animate-pulse-gold {
+  animation: pulse-gold 2s ease-in-out infinite;
+}
+
+/* Luxury Button Styles */
+.btn-luxury {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.btn-luxury::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.6s ease;
+}
+
+.btn-luxury:hover::before {
+  left: 100%;
+}
+
+/* Magnetic Hover Effect */
+.magnetic-hover {
+  transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* Image Parallax Container */
+.parallax-container {
+  overflow: hidden;
+}
+
+.parallax-image {
+  transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.parallax-container:hover .parallax-image {
+  transform: scale(1.05);
+}
+
+/* Gold Gradient Text */
+.text-gradient-gold {
+  background: linear-gradient(135deg, var(--gold-300) 0%, var(--gold-500) 50%, var(--gold-300) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Luxury Card Hover */
+.luxury-card {
+  transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.luxury-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+}
+
+/* Separator Lines */
+.line-separator {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold-400), transparent);
+}
+
+/* Loading Screen */
+.loading-screen {
+  position: fixed;
+  inset: 0;
+  background: var(--obsidian);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+/* Custom Input Styles for Luxury Feel */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="tel"],
+textarea,
+select {
+  transition: all 0.3s ease;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+input[type="tel"]:focus,
+textarea:focus,
+select:focus {
+  border-color: var(--gold-400);
+  box-shadow: 0 0 0 1px var(--gold-400);
+}
+
+/* Product Image Gallery */
+.product-gallery-image {
+  cursor: zoom-in;
+  transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.product-gallery-image:hover {
+  filter: brightness(1.05);
+}
+
+/* Cart Drawer Styling */
+.cart-drawer {
+  background: var(--background);
+  box-shadow: -10px 0 40px rgba(0, 0, 0, 0.1);
+}
+
+/* Payment Method Cards */
+.payment-method-card {
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+}
+
+.payment-method-card:hover {
+  border-color: var(--gold-400);
+}
+
+.payment-method-card.selected {
+  border-color: var(--gold-500);
+  background: var(--gold-50);
+}
+
+/* Scent Notes Visualization */
+.scent-note-pill {
+  background: linear-gradient(135deg, var(--gold-50), var(--gold-100));
+  border: 1px solid var(--gold-200);
+  transition: all 0.3s ease;
+}
+
+.scent-note-pill:hover {
+  background: linear-gradient(135deg, var(--gold-100), var(--gold-200));
+  transform: scale(1.05);
+}
+
+/* Admin Dashboard Styles */
+.admin-sidebar {
+  background: var(--obsidian);
+}
+
+.admin-nav-item {
+  transition: all 0.3s ease;
+}
+
+.admin-nav-item:hover {
+  background: rgba(196, 154, 58, 0.1);
+}
+
+.admin-nav-item.active {
+  background: rgba(196, 154, 58, 0.2);
+  border-left: 3px solid var(--gold-400);
+}
+
+/* Status Badges */
+.status-pending {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.status-processing {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.status-shipped {
+  background: #e0e7ff;
+  color: #3730a3;
+}
+
+.status-delivered {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.status-cancelled {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+/* Responsive Typography */
+@media (max-width: 768px) {
+  .hero-title {
+    font-size: 2.5rem;
+    line-height: 1.2;
+  }
+  
+  .section-title {
+    font-size: 1.75rem;
+  }
+}
+
+@media (min-width: 769px) {
+  .hero-title {
+    font-size: 4rem;
+    line-height: 1.1;
+  }
+  
+  .section-title {
+    font-size: 2.5rem;
+  }
+}
+
+/* Utility Classes */
+.text-balance {
+  text-wrap: balance;
+}
+
+.sticky-footer-wrapper {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.sticky-footer-wrapper main {
+  flex: 1;
+}
+
+/* Skeleton Loading */
+.skeleton {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+/* Toast Styling */
+.toast-luxury {
+  background: var(--obsidian);
+  color: var(--pearl);
+  border-left: 4px solid var(--gold-400);
+}

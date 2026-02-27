@@ -1,0 +1,448 @@
+// Adalagi Luxury Perfume E-commerce Database Schema
+// Designed for Indonesian market with comprehensive payment & shipping support
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================
+// USER MANAGEMENT
+// ============================================
+
+model User {
+  id            String     @id @default(cuid())
+  email         String     @unique
+  password      String
+  name          String?
+  phone         String?
+  role          UserRole   @default(CUSTOMER)
+  isVip         Boolean    @default(false)
+  vipSince      DateTime?
+  emailVerified DateTime?
+  image         String?
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  addresses     Address[]
+  orders        Order[]
+  reviews       Review[]
+  wishlist      WishlistItem[]
+  cart          CartItem[]
+}
+
+enum UserRole {
+  CUSTOMER
+  VIP
+  ADMIN
+  SUPER_ADMIN
+}
+
+model Address {
+  id           String   @id @default(cuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  label        String   // e.g., "Home", "Office"
+  recipientName String
+  phone        String
+  province     String
+  provinceId   String   // RajaOngkir province ID
+  city         String
+  cityId       String   // RajaOngkir city ID
+  district     String   // Kecamatan
+  districtId   String   // RajaOngkir subdistrict ID
+  postalCode   String
+  fullAddress  String
+  isDefault    Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  orders       Order[]
+}
+
+// ============================================
+// PRODUCT CATALOG
+// ============================================
+
+model Category {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  slug        String   @unique
+  description String?
+  image       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  products    Product[]
+}
+
+model ScentProfile {
+  id          String   @id @default(cuid())
+  name        String   @unique // e.g., "Woody", "Floral", "Fresh", "Oriental"
+  slug        String   @unique
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  products    Product[]
+}
+
+model Product {
+  id              String   @id @default(cuid())
+  name            String
+  slug            String   @unique
+  description     String
+  longDescription String?
+  categoryId      String?
+  category        Category? @relation(fields: [categoryId], references: [id])
+  
+  // Scent Information
+  scentProfileId  String?
+  scentProfile    ScentProfile? @relation(fields: [scentProfileId], references: [id])
+  topNotes        String   // Comma-separated: "Bergamot, Lemon, Pink Pepper"
+  heartNotes      String   // Comma-separated
+  baseNotes       String   // Comma-separated
+  
+  // Pricing & Inventory
+  basePrice       Float    // Base price in IDR
+  comparePrice    Float?   // Original price for discounts
+  costPrice       Float?   // For profit calculation
+  
+  // Product Details
+  concentration   String   // EDP, EDT, Parfum
+  gender          String   // Unisex, Men, Women
+  launchYear      Int?
+  
+  // Media
+  images          String   // JSON array of image URLs
+  mainImage       String
+  
+  // Status
+  isActive        Boolean  @default(true)
+  isFeatured      Boolean  @default(false)
+  isNewArrival    Boolean  @default(false)
+  isBestSeller    Boolean  @default(false)
+  
+  // Inventory
+  sku             String   @unique
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  variants        ProductVariant[]
+  cartItems       CartItem[]
+  orderItems      OrderItem[]
+  reviews         Review[]
+  wishlistItems   WishlistItem[]
+}
+
+model ProductVariant {
+  id          String   @id @default(cuid())
+  productId   String
+  product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  
+  name        String   // e.g., "50ml", "100ml"
+  size        Int      // Size in ml
+  sku         String   @unique
+  price       Float    // Variant-specific price in IDR
+  comparePrice Float?
+  stock       Int      @default(0)
+  isActive    Boolean  @default(true)
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  cartItems   CartItem[]
+  orderItems  OrderItem[]
+}
+
+// ============================================
+// SHOPPING CART
+// ============================================
+
+model CartItem {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  productId   String
+  product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  variantId   String
+  variant     ProductVariant @relation(fields: [variantId], references: [id], onDelete: Cascade)
+  quantity    Int      @default(1)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model WishlistItem {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  productId   String
+  product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+}
+
+// ============================================
+// ORDERS & PAYMENTS
+// ============================================
+
+model Order {
+  id              String      @id @default(cuid())
+  orderNumber     String      @unique // e.g., "ADL-2024-000001"
+  userId          String?
+  user            User?       @relation(fields: [userId], references: [id])
+  
+  // Shipping Address (snapshot at order time)
+  addressId       String?
+  address         Address?    @relation(fields: [addressId], references: [id])
+  recipientName   String
+  phone           String
+  province        String
+  city            String
+  district        String
+  postalCode      String
+  fullAddress     String
+  
+  // Pricing
+  subtotal        Float       // Sum of items
+  shippingCost    Float       // From RajaOngkir
+  discountAmount  Float       @default(0)
+  taxAmount       Float       @default(0)
+  totalAmount     Float       // Final total in IDR
+  
+  // Shipping
+  courier         String?     // JNE, Sicepat, J&T, Paxel
+  courierService  String?     // REG, YES, etc.
+  trackingNumber  String?     // Airway Bill / Resi
+  estimatedDelivery DateTime?
+  
+  // Status
+  status          OrderStatus @default(PENDING)
+  paymentStatus   PaymentStatus @default(PENDING)
+  
+  // Notes
+  notes           String?
+  internalNotes   String?
+  
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  items           OrderItem[]
+  payments        Payment[]
+  statusHistory   OrderStatusHistory[]
+}
+
+enum OrderStatus {
+  PENDING         // Waiting for payment
+  PROCESSING      // Payment confirmed, preparing order
+  SHIPPED         // Order shipped
+  DELIVERED       // Order delivered
+  CANCELLED       // Order cancelled
+  REFUNDED        // Order refunded
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  EXPIRED
+  REFUNDED
+  PARTIAL_REFUND
+}
+
+model OrderItem {
+  id          String   @id @default(cuid())
+  orderId     String
+  order       Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId   String
+  product     Product  @relation(fields: [productId], references: [id])
+  variantId   String
+  variant     ProductVariant @relation(fields: [variantId], references: [id])
+  
+  productName    String  // Snapshot of product name
+  variantName    String  // Snapshot of variant name
+  quantity    Int
+  unitPrice   Float    // Price per unit at order time
+  totalPrice  Float    // quantity * unitPrice
+  
+  createdAt   DateTime @default(now())
+}
+
+model OrderStatusHistory {
+  id          String     @id @default(cuid())
+  orderId     String
+  order       Order      @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  status      OrderStatus
+  notes       String?
+  createdAt   DateTime   @default(now())
+}
+
+// ============================================
+// PAYMENT PROCESSING (Midtrans/Xendit compatible)
+// ============================================
+
+model Payment {
+  id              String        @id @default(cuid())
+  orderId         String
+  order           Order         @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  
+  // Payment Gateway Data
+  gateway         PaymentGateway
+  gatewayOrderId  String?       // Order ID from gateway
+  gatewayTransId  String?       // Transaction ID from gateway
+  
+  // Payment Method
+  paymentType     PaymentType
+  paymentMethod   String?       // e.g., "bca", "mandiri", "gopay"
+  
+  // Amounts
+  amount          Float
+  fee             Float         @default(0)
+  netAmount       Float         // amount - fee
+  
+  // Status
+  status          PaymentStatus @default(PENDING)
+  
+  // Virtual Account Details
+  vaNumber        String?
+  vaBank         String?
+  vaExpiresAt    DateTime?
+  
+  // QRIS Details
+  qrisString     String?
+  qrisExpiresAt  DateTime?
+  
+  // E-Wallet Details
+  ewalletDeepLink String?
+  ewalletQrString String?
+  
+  // Timestamps
+  paidAt          DateTime?
+  expiredAt       DateTime?
+  cancelledAt     DateTime?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+}
+
+enum PaymentGateway {
+  MIDTRANS
+  XENDIT
+  DOKU
+  MANUAL
+}
+
+enum PaymentType {
+  QRIS
+  VIRTUAL_ACCOUNT
+  E_WALLET
+  CREDIT_CARD
+  BANK_TRANSFER
+  CASH_ON_DELIVERY
+}
+
+// ============================================
+// REVIEWS & RATINGS
+// ============================================
+
+model Review {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  productId   String
+  product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  
+  rating      Int      // 1-5
+  title       String?
+  content     String?
+  isVerified  Boolean  @default(false) // Verified purchase
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// ============================================
+// CONTENT MANAGEMENT (CMS)
+// ============================================
+
+model Banner {
+  id          String   @id @default(cuid())
+  title       String
+  subtitle    String?
+  image       String
+  link        String?
+  position    String   // "hero", "middle", "bottom"
+  isActive    Boolean  @default(true)
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model ContentBlock {
+  id          String   @id @default(cuid())
+  type        String   // "text", "image", "video", "quote"
+  title       String?
+  content     String   // HTML or markdown content
+  page        String   // "home", "about", "contact"
+  section     String   // "philosophy", "story", "values"
+  order       Int      @default(0)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// ============================================
+// SHIPPING CONFIGURATION
+// ============================================
+
+model ShippingZone {
+  id          String   @id @default(cuid())
+  name        String
+  provinces   String   // JSON array of province IDs
+  courier     String   // JNE, Sicepat, etc.
+  serviceType String   // REG, YES, etc.
+  baseRate    Float
+  perKgRate   Float
+  estimatedDays String
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// ============================================
+// PROMOTIONS & DISCOUNTS
+// ============================================
+
+model Promotion {
+  id              String   @id @default(cuid())
+  code            String   @unique
+  description     String?
+  discountType    String   // "percentage", "fixed"
+  discountValue   Float
+  minPurchase     Float?
+  maxDiscount     Float?
+  usageLimit      Int?
+  usageCount      Int      @default(0)
+  validFrom       DateTime
+  validUntil      DateTime
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+// ============================================
+// SITE SETTINGS
+// ============================================
+
+model SiteSetting {
+  id          String   @id @default(cuid())
+  key        String   @unique
+  value      String   // JSON value for complex settings
+  type       String   // "string", "json", "number", "boolean"
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
