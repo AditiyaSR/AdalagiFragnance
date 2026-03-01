@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 
+const toNumber = (value: string | number) =>
+  typeof value === 'number' ? value : parseFloat(value);
+
 // GET /api/admin/products/[id] - Get single product
 export async function GET(
   request: NextRequest,
@@ -94,8 +97,8 @@ export async function PUT(
         topNotes: Array.isArray(topNotes) ? topNotes.join(', ') : topNotes,
         heartNotes: Array.isArray(heartNotes) ? heartNotes.join(', ') : heartNotes,
         baseNotes: Array.isArray(baseNotes) ? baseNotes.join(', ') : baseNotes,
-        basePrice: parseFloat(basePrice),
-        comparePrice: comparePrice ? parseFloat(comparePrice) : null,
+        basePrice: toNumber(basePrice),
+        comparePrice: comparePrice ? toNumber(comparePrice) : null,
         concentration,
         gender,
         launchYear: launchYear ? parseInt(launchYear) : null,

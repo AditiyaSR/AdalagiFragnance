@@ -56,6 +56,19 @@ export interface ScentProfile {
   description?: string;
 }
 
+export interface Banner {
+  id: string;
+  title: string;
+  subtitle?: string;
+  image: string;
+  link?: string;
+  position: string;
+  isActive: boolean;
+  order: number;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 export interface Review {
   id: string;
   userId: string;
@@ -196,6 +209,7 @@ export type PaymentType =
 
 export interface ShippingOption {
   courier: string;
+  courierCode: string;
   service: string;
   serviceType: string;
   cost: number;
