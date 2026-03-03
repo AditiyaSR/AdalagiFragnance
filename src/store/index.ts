@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import type { Product, ProductVariant, CartItem, User, Address } from '@/types';
+import type { Product, ProductVariant, CartItem, User, Address, ShippingOption } from '@/types';
 
 // ============================================
 // CART STORE
@@ -214,12 +214,7 @@ interface CheckoutState {
     postalCode: string;
     fullAddress: string;
   } | null;
-  selectedCourier: {
-    courier: string;
-    service: string;
-    cost: number;
-    estimatedDays: string;
-  } | null;
+  selectedCourier: ShippingOption | null;
   discountCode: string;
   discountAmount: number;
   selectedPaymentType: string;
