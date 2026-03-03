@@ -11,7 +11,8 @@
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
     "db:reset": "prisma migrate reset",
-    "deploy:hook": "bash scripts/deploy-hook.sh"
+    "deploy:hook": "bash scripts/deploy-hook.sh",
+    "deploy:prod": "vercel deploy --prod --yes"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
